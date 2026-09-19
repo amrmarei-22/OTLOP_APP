@@ -42,14 +42,3 @@ class GetBrandsFailureState extends ProductsState {
   GetBrandsFailureState({required this.errMessage});
 }
 
-class AddToCartLoadingState extends ProductsState {}
-
-class AddToCartSuccessState extends ProductsState {
-  final String message;
-  AddToCartSuccessState({required this.message});
-}
-
-class AddToCartFailureState extends ProductsState {
-  final String error;
-  AddToCartFailureState({required this.error});
-}
