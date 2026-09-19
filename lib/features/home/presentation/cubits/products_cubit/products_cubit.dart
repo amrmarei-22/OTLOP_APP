@@ -25,47 +25,9 @@ class ProductsCubit extends Cubit<ProductsState> {
     );
   }
 
-  Future<void> addToCart(int productId) async {
-    emit(AddToCartLoadingState());
-    await homeRemoteDataSource.addToCart(productId).then(
-      onError: (error) {
-        log("Error in cubit: $error");
-        emit(AddToCartFailureState(error: error.toString()));
-        getProducts();
-      },
-      (val) {
-        log("Value in cubit");
-        emit(AddToCartSuccessState(message: "Product added to cart successfully"));
-        getProducts(); 
-      },
-    );
-  }
+ 
 
-  Future <void> getCategories() async {
-    emit(GetCategoriesLoadingState());
-    await homeRemoteDataSource.getCategories().then(
-      onError: (error) {
-        log("Error in cubit: $error");
-        emit(GetCategoriesFailureState(errMessage: error.toString()));
-      },
-      (val) {
-        // log("Value in cubit: $val");
-        emit(GetCategoriesSuccessState(categories: val));
-      },
-    );
-  }
+  
 
-  Future <void> getBrands() async {
-    emit(GetBrandsLoadingState());
-    await homeRemoteDataSource.getBrands().then(
-      onError: (error) {
-        // log("Error in cubit: $error");
-        emit(GetBrandsFailureState(errMessage: error.toString()));
-      },
-      (val) {
-        // log("Value in cubit: $val");
-        emit(GetBrandsSuccessState(brands: val));
-      },
-    );
-  }
+  
 }

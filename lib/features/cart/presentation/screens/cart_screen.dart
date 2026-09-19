@@ -1,10 +1,14 @@
 // cart_screen.dart
-import 'dart:developer';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:otlop_app/core/theme/app_colors.dart';
 import 'package:otlop_app/core/theme/app_styles.dart';
+import 'package:otlop_app/features/cart/data/models/cart_item_model.dart';
+import 'package:otlop_app/features/cart/presentation/cubit/cart_cubit.dart';
+import 'package:otlop_app/features/cart/presentation/states/cart_states.dart';
+import 'package:otlop_app/features/orders/presentation/cubit/orders_cubit.dart';
+import 'package:otlop_app/features/orders/presentation/states/orders_states.dart';
+import 'package:otlop_app/main_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -14,35 +18,23 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  List myCart = [];
-  late Future getCartFuture;
-  Future<List> getCart() async {
-    try {
-      final Dio dio = Dio();
-      final Response response = await dio.get(
-        'https://talabat639.runasp.net/api/Basket',
-        options: Options(
-          headers: {
-            'Authorization':
-                'Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9naXZlbm5hbWUiOiJhbXIxMjMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhbXIxMjNAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiJjNjJiODQzYi0wOWVlLTQxNWYtOWMwMC1kMmRkODViYmE1YmUiLCJleHAiOjE3ODk2NjQ1MzAsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNjQiLCJhdWQiOiJNeVNlY3VyZWRBUElVc2VycyJ9.TeBERVi2Vo0_JgJ2ONf8pZYpasleeq8MQcjuojAlijk',
-          },
-        ),
-      );
-      log("Response: $response");
+  static const double deliveryFee = 25;
 
-      myCart = response.data['items'];
-      return myCart;
-    } on DioException catch (e) {
-      log(e.response?.data.toString() ?? 'Error');
-      throw Exception(e.response?.data['message']);
-    }
+  double calculateSubtotal(List<CartItemModel> cartItems) {
+    return cartItems.fold(
+      0,
+      (subtotal, item) => subtotal + (item.price * item.quantity),
+    );
+  }
+
+  double calculateTotal(List<CartItemModel> cartItems) {
+    return calculateSubtotal(cartItems) + deliveryFee;
   }
 
   @override
   void initState() {
     super.initState();
-    getCartFuture = getCart();
-    log(getCartFuture.toString());
+    BlocProvider.of<CartCubit>(context).getCartItems();
   }
 
   @override
@@ -52,126 +44,236 @@ class _CartScreenState extends State<CartScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Your Cart", style: AppStyles.style30ExtraBold),
-                Text(
-                  "2 items",
-                  style: AppStyles.style13Medium.copyWith(
-                    color: AppColors.greyClr,
-                  ),
-                ),
-                SizedBox(height: 10),
+            child: BlocBuilder<CartCubit, CartStates>(
+              builder: (context, state) {
+                if (state is GetCartItemsLoadingState) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (state is GetCartItemsFailureState) {
+                  if (state.error.contains("Internal Server Error")) {
+                    return Center(
+                      child: Text(
+                        "No items in the cart",
+                        style: AppStyles.style16Bold,
+                      ),
+                    );
+                  }
+                  return Text(state.error);
+                } else if (state is GetCartItemsSuccessState) {
+                  final cartItems = state.cartItems;
+                  final subtotal = calculateSubtotal(cartItems);
+                  final total = calculateTotal(cartItems);
 
-                Column(
-                  children: [
-                    ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: 3,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: AspectRatio(
-                                    aspectRatio: 1,
-                                    child: ClipRRect(
-                                      borderRadius:
-                                          BorderRadiusGeometry.circular(15),
-                                      child: Image.network(
-                                        myCart[index]['pictureUrl'],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 15),
-                                Expanded(
-                                  flex: 2,
-                                  child: Column(
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Your Cart", style: AppStyles.style30ExtraBold),
+                      Text(
+                        "${cartItems.length} items",
+                        style: AppStyles.style13Medium.copyWith(
+                          color: AppColors.greyClr,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+
+                      Column(
+                        children: [
+                          ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: cartItems.length,
+                            itemBuilder: (context, index) {
+                              return Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'ldbljeb',
-                                        style: AppStyles.style14Bold,
+                                      Expanded(
+                                        child: AspectRatio(
+                                          aspectRatio: 1,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadiusGeometry.circular(
+                                                  15,
+                                                ),
+                                            child: Image.network(
+                                              cartItems[index].pictureUrl,
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                      Text(
-                                        '${myCart[index]['brand']} · ${myCart[index]['category']}',
-                                        style: AppStyles.style11Medium,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            '${myCart[index]['price']} EGP',
-                                            style: AppStyles.style14Bold,
-                                          ),
-                                          Spacer(),
-                                          IconButton(
-                                            onPressed: () {},
-                                            icon: Icon(Icons.remove),
-                                          ),
-                                          Text(
-                                            myCart[index]['quantity']
-                                                .toString(),
-                                          ),
-                                          IconButton(
-                                            onPressed: () {},
-                                            icon: Icon(Icons.add),
-                                          ),
-                                        ],
+                                      SizedBox(width: 15),
+                                      Expanded(
+                                        flex: 2,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              cartItems[index].productName,
+                                              style: AppStyles.style14Bold,
+                                            ),
+                                            Text(
+                                              '${cartItems[index].brand} · ${cartItems[index].category}',
+                                              style: AppStyles.style11Medium,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  '${cartItems[index].price} EGP',
+                                                  style: AppStyles.style14Bold,
+                                                ),
+                                                Spacer(),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    final currentQuantity =
+                                                        cartItems[index]
+                                                            .quantity;
+                                                    context
+                                                        .read<CartCubit>()
+                                                        .updateCartItem(
+                                                          cartItems[index].id,
+                                                          currentQuantity - 1,
+                                                        );
+                                                  },
+                                                  icon: Icon(Icons.remove),
+                                                ),
+                                                Text(
+                                                  '${cartItems[index].quantity}',
+                                                  style: AppStyles.style14Bold,
+                                                ),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    final currentQuantity =
+                                                        cartItems[index]
+                                                            .quantity;
+                                                    context
+                                                        .read<CartCubit>()
+                                                        .updateCartItem(
+                                                          cartItems[index].id,
+                                                          currentQuantity + 1,
+                                                        );
+                                                  },
+                                                  icon: Icon(Icons.add),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 10,
-                          children: [
-                            Text("Order Summary", style: AppStyles.style14Bold),
-                            SizedBox(height: 10),
-                            CustomSummaryItem(title: 'Subtotal', value: '400'),
-                            CustomSummaryItem(
-                              title: 'Delivery Fee',
-                              value: '25',
+                          if (cartItems.isNotEmpty)
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  spacing: 10,
+                                  children: [
+                                    Text(
+                                      "Order Summary",
+                                      style: AppStyles.style14Bold,
+                                    ),
+                                    SizedBox(height: 10),
+                                    CustomSummaryItem(
+                                      title: 'Subtotal',
+                                      value: subtotal,
+                                    ),
+                                    CustomSummaryItem(
+                                      title: 'Delivery Fee',
+                                      value: deliveryFee,
+                                    ),
+
+                                    Divider(),
+
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'Total',
+                                          style: AppStyles.style16Bold,
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          '${total.toStringAsFixed(2)} EGP',
+                                          style: AppStyles.style16Bold.copyWith(
+                                            color: AppColors.primayClr,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-
-                            Divider(),
-
-                            Row(
-                              children: [
-                                Text('Total', style: AppStyles.style16Bold),
-                                Spacer(),
-                                Text(
-                                  '420 EGP',
-                                  style: AppStyles.style16Bold.copyWith(
-                                    color: AppColors.primayClr,
+                          if (cartItems.isNotEmpty) ...[
+                            SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  final ordersCubit = context
+                                      .read<OrdersCubit>();
+                                  final orderId = await ordersCubit
+                                      .postAndGetOrder();
+                                  if (!context.mounted) return;
+                                  if (orderId == null ||
+                                      ordersCubit.state is OrdersFailureState) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          (ordersCubit.state
+                                                  as OrdersFailureState)
+                                              .error,
+                                        ),
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => MainScreen(
+                                        index: 3,
+                                        orderId: orderId,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primayClr,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
                                   ),
                                 ),
-                              ],
+                                child: Text(
+                                  'Proceed to Checkout • ${total.toStringAsFixed(2)} EGP',
+                                  style: AppStyles.style14Bold.copyWith(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
-                        ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
 
-                SizedBox(height: 30),
-              ],
+                      SizedBox(height: 30),
+                    ],
+                  );
+                } else {
+                  return Center(child: Text("No items in the cart"));
+                }
+              },
             ),
           ),
         ),
@@ -186,7 +288,8 @@ class CustomSummaryItem extends StatelessWidget {
     required this.title,
     required this.value,
   });
-  final String title, value;
+  final String title;
+  final double value;
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -196,7 +299,10 @@ class CustomSummaryItem extends StatelessWidget {
           style: AppStyles.style14Medium.copyWith(color: AppColors.greyClr),
         ),
         Spacer(),
-        Text('$value EGP', style: AppStyles.style14SemiBold),
+        Text(
+          '${value.toStringAsFixed(2)} EGP',
+          style: AppStyles.style14SemiBold,
+        ),
       ],
     );
   }

@@ -2,6 +2,7 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:otlop_app/features/auth/data/auth_session.dart';
 
 class AuthRemoteDataSource {
   final Dio dio = Dio();
@@ -13,6 +14,11 @@ class AuthRemoteDataSource {
 
         data: {"email": email, "password": pass},
       );
+      final token = response.data is Map ? response.data['token'] : null;
+      if (token is! String || token.isEmpty) {
+        throw Exception('Login response did not contain an access token');
+      }
+      AuthSession.accessToken = token;
       log(response.data.toString());
     } on DioException catch (e) {
       log(e.response?.data.toString() ?? 'error');

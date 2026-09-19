@@ -45,24 +45,6 @@ class HomeRemoteDataSource {
   
 
 
-Future<void> addToCart(int productId) async {
-    try {
-      final Response response = await dio.post(
-        "https://talabat639.runasp.net/api/Basket",
-        data: {"productId": productId, "quantity": 1},
-        options: Options(
-          headers: {
-            "Authorization":
-                "Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9naXZlbm5hbWUiOiJhbXIxNTUiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhbXIxNTVAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiI5ODFiOTA4NS1hYmQ5LTQ3NjUtOTc3ZC1iN2ZiMjY1YjhmYjgiLCJleHAiOjE3ODg1NTI1ODUsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNjQiLCJhdWQiOiJNeVNlY3VyZWRBUElVc2VycyJ9.vZGeCAkfNoF-TEe6uTTGHKzDB_mgBTkZAE_bdja6irE",
-          },
-        ),
-      );
-      return response.data;
-    } on DioException catch (e) {
-      log("Error: ${e.response!.data}");
-      throw Exception(e.response?.data['message']);
-    }
-  }
 
   Future<List> getBrands() async {
     try {
