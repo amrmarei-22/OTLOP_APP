@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:otlop_app/features/auth/data/auth_session.dart';
 import 'package:otlop_app/features/orders/data/models/delivery_method_model.dart';
 import 'package:otlop_app/features/orders/data/models/order_model.dart';
 
@@ -12,19 +13,23 @@ class OrdersRemoteDataSource {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization':
-          'Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9naXZlbm5hbWUiOiJhbXIxMjMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhbXIxMjNAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiJjNjJiODQzYi0wOWVlLTQxNWYtOWMwMC1kMmRkODViYmE1YmUiLCJleHAiOjE3ODk4NTY0NjksImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNjQiLCJhdWQiOiJNeVNlY3VyZWRBUElVc2VycyJ9.XdhXAEmuScxTFDD45EMA675K4fYT5V64bLuNXUOYOXc',
+      'Authorization': AuthSession.authorizationHeader,
     },
   );
 
-  Future<List<OrderModel>> getOrders(int orderId) async {
+  Future<List<OrderModel>> getOrders() async {
     try {
-      final response = await dio.get(
-        '$baseUrl/Orders/$orderId',
-        options: _options,
-      );
+      final response = await dio.get('$baseUrl/Orders', options: _options);
       if (response.data is Map<String, dynamic>) {
-        return [OrderModel.fromJson(response.data as Map<String, dynamic>)];
+        final data = response.data as Map<String, dynamic>;
+        final orders = data['orders'];
+        if (orders is List) {
+          return orders
+              .whereType<Map<String, dynamic>>()
+              .map(OrderModel.fromJson)
+              .toList();
+        }
+        return [OrderModel.fromJson(data)];
       } else if (response.data is List) {
         return (response.data as List)
             .whereType<Map<String, dynamic>>()

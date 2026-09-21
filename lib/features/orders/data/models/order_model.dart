@@ -17,6 +17,17 @@ class OrderModel {
     required this.total,
   });
 
+  OrderModel copyWith({double? total}) {
+    return OrderModel(
+      id: id,
+      status: status,
+      orderDate: orderDate,
+      items: items,
+      deliveryMethod: deliveryMethod,
+      total: total ?? this.total,
+    );
+  }
+
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
       id: (json['id'] as num?)?.toInt() ?? 0,

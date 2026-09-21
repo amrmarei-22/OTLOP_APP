@@ -8,7 +8,6 @@ import 'package:otlop_app/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:otlop_app/features/cart/presentation/states/cart_states.dart';
 import 'package:otlop_app/features/orders/presentation/cubit/orders_cubit.dart';
 import 'package:otlop_app/features/orders/presentation/states/orders_states.dart';
-import 'package:otlop_app/main_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -19,6 +18,7 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   static const double deliveryFee = 25;
+  bool _isCheckingOut = false;
 
   double calculateSubtotal(List<CartItemModel> cartItems) {
     return cartItems.fold(
@@ -217,33 +217,51 @@ class _CartScreenState extends State<CartScreen> {
                               width: double.infinity,
                               child: ElevatedButton(
                                 onPressed: () async {
+                                  setState(() => _isCheckingOut = true);
                                   final ordersCubit = context
                                       .read<OrdersCubit>();
-                                  final orderId = await ordersCubit
-                                      .postAndGetOrder();
-                                  if (!context.mounted) return;
-                                  if (orderId == null ||
-                                      ordersCubit.state is OrdersFailureState) {
+                                  final cartCubit = context.read<CartCubit>();
+                                  try {
+                                    final orderId = await ordersCubit
+                                        .postAndGetOrder(total: total);
+                                    if (orderId == null ||
+                                        ordersCubit.state
+                                            is OrdersFailureState) {
+                                      throw Exception(
+                                        ordersCubit.state is OrdersFailureState
+                                            ? (ordersCubit.state
+                                                      as OrdersFailureState)
+                                                  .error
+                                            : 'Checkout failed',
+                                      );
+                                    }
+                                    await cartCubit.clearCart();
+                                    if (cartCubit.state
+                                        is ClearCartFailureState) {
+                                      throw Exception(
+                                        (cartCubit.state
+                                                as ClearCartFailureState)
+                                            .error,
+                                      );
+                                    }
+                                    if (!context.mounted) return;
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          (ordersCubit.state
-                                                  as OrdersFailureState)
-                                              .error,
+                                          'Order #$orderId placed successfully',
                                         ),
                                       ),
                                     );
-                                    return;
+                                  } catch (error) {
+                                    if (!context.mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(error.toString())),
+                                    );
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() => _isCheckingOut = false);
+                                    }
                                   }
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => MainScreen(
-                                        index: 3,
-                                        orderId: orderId,
-                                      ),
-                                    ),
-                                  );
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primayClr,
@@ -255,12 +273,21 @@ class _CartScreenState extends State<CartScreen> {
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                 ),
-                                child: Text(
-                                  'Proceed to Checkout • ${total.toStringAsFixed(2)} EGP',
-                                  style: AppStyles.style14Bold.copyWith(
-                                    color: Colors.white,
-                                  ),
-                                ),
+                                child: _isCheckingOut
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : Text(
+                                        'Proceed to Checkout • ${total.toStringAsFixed(2)} EGP',
+                                        style: AppStyles.style14Bold.copyWith(
+                                          color: Colors.white,
+                                        ),
+                                      ),
                               ),
                             ),
                           ],

@@ -10,18 +10,28 @@ class OrdersCubit extends Cubit<OrdersState> {
   OrdersCubit() : super(OrdersInitialState());
   final OrdersRemoteDataSource ordersRemoteDataSource =
       OrdersRemoteDataSource();
+  List<OrderModel> orders = [];
 
-  Future<void> getOrders(int orderId) async {
+  Future<void> getOrders() async {
     emit(OrdersLoadingState());
     try {
-      emit(
-        OrdersSuccessState(
-          orders: await ordersRemoteDataSource.getOrders(orderId),
-        ),
-      );
+      final remoteOrders = await ordersRemoteDataSource.getOrders();
+      final ordersById = <int, OrderModel>{
+        for (final order in orders) order.id: order,
+      };
+      for (final order in remoteOrders) {
+        ordersById[order.id] = order;
+      }
+      orders = ordersById.values.toList()
+        ..sort((first, second) => second.orderDate.compareTo(first.orderDate));
+      emit(OrdersSuccessState(orders: orders));
     } catch (error) {
       log('Orders error: $error');
-      emit(OrdersFailureState(error: error.toString()));
+      if (orders.isNotEmpty) {
+        emit(OrdersSuccessState(orders: orders));
+      } else {
+        emit(OrdersFailureState(error: error.toString()));
+      }
     }
   }
 
@@ -33,7 +43,7 @@ class OrdersCubit extends Cubit<OrdersState> {
     return ordersRemoteDataSource.postOrder(deliveryMethodId: deliveryMethodId);
   }
 
-  Future<int?> postAndGetOrder() async {
+  Future<int?> postAndGetOrder({double? total}) async {
     emit(OrdersLoadingState());
     try {
       final methods = await getDeliveryMethods();
@@ -42,8 +52,12 @@ class OrdersCubit extends Cubit<OrdersState> {
       }
       final createdOrder = await postOrder(deliveryMethodId: methods.first.id);
       final order = await ordersRemoteDataSource.getOrder(createdOrder.id);
-      emit(OrdersSuccessState(orders: [order]));
-      return order.id;
+      final orderWithTotal = total == null
+          ? order
+          : order.copyWith(total: total);
+      orders = [orderWithTotal, ...orders.where((item) => item.id != order.id)];
+      emit(OrdersSuccessState(orders: orders));
+      return orderWithTotal.id;
     } catch (error) {
       log('Post and get order error: $error');
       emit(OrdersFailureState(error: error.toString()));

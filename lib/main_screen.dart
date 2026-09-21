@@ -12,9 +12,8 @@ import 'package:otlop_app/features/orders/presentation/cubit/orders_cubit.dart';
 import 'package:otlop_app/features/orders/presentation/screens/orders_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  MainScreen({super.key, this.index, this.orderId});
+  MainScreen({super.key, this.index});
   int? index;
-  final int? orderId;
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
@@ -26,7 +25,7 @@ class _MainScreenState extends State<MainScreen> {
       const HomeScreen(),
       const Center(child: Text("Explore")),
       const CartScreen(),
-      OrdersScreen(orderId: widget.orderId),
+      const OrdersScreen(),
       const Center(child: Text("Profile")),
     ];
 
