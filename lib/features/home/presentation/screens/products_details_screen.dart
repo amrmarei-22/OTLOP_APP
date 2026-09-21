@@ -85,7 +85,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   border: Border.all(color: Colors.grey.shade300, width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: Colors.black.withValues(alpha: 0.08),
                       blurRadius: 15,
                       spreadRadius: 2,
                       offset: const Offset(0, -3),

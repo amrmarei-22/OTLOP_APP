@@ -26,11 +26,6 @@ class CartCubit extends Cubit<CartStates> {
   Future<void> _addOrUpdateProduct(int productId, int amountToAdd) async {
     emit(AddToCartLoadingState());
     try {
-      if (!_cartLoaded) {
-        cartItems = await cartRemoteDataSource.getCartItems();
-        _cartLoaded = true;
-      }
-
       final itemIndex = cartItems.indexWhere((item) => item.id == productId);
       final existingQuantity = itemIndex == -1
           ? 0
@@ -43,6 +38,11 @@ class CartCubit extends Cubit<CartStates> {
       }
 
       await cartRemoteDataSource.addToCart(productId, newQuantity);
+
+      if (!_cartLoaded) {
+        cartItems = await cartRemoteDataSource.getCartItems();
+        _cartLoaded = true;
+      }
 
       if (itemIndex == -1) {
         cartItems = await cartRemoteDataSource.getCartItems();
@@ -91,6 +91,22 @@ class CartCubit extends Cubit<CartStates> {
     } catch (error) {
       log("Error in cart cubit: $error");
       await getCartItems();
+    }
+  }
+
+  Future<void> clearCart() async {
+    emit(ClearCartLoadingState());
+    try {
+      final itemIds = cartItems.map((item) => item.id).toList();
+      for (final itemId in itemIds) {
+        await cartRemoteDataSource.removeFromCart(itemId);
+      }
+      cartItems = [];
+      _cartLoaded = false;
+      emit(GetCartItemsSuccessState(cartItems: cartItems));
+    } catch (error) {
+      log("Error clearing cart: $error");
+      emit(ClearCartFailureState(error: error.toString()));
     }
   }
 }

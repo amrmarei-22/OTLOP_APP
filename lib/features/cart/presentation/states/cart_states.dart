@@ -23,6 +23,15 @@ class GetCartItemsSuccessState extends CartStates {
   GetCartItemsSuccessState({required this.cartItems});
 }
 
+class ClearCartLoadingState extends CartStates {}
+
+class ClearCartSuccessState extends CartStates {}
+
+class ClearCartFailureState extends CartStates {
+  final String error;
+  ClearCartFailureState({required this.error});
+}
+
 class GetCartItemsFailureState extends CartStates {
   final String error;
   GetCartItemsFailureState({required this.error});

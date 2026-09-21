@@ -5,8 +5,7 @@ import 'package:otlop_app/features/orders/presentation/cubit/orders_cubit.dart';
 import 'package:otlop_app/features/orders/presentation/states/orders_states.dart';
 
 class OrdersScreen extends StatefulWidget {
-  final int? orderId;
-  const OrdersScreen({super.key, this.orderId});
+  const OrdersScreen({super.key});
 
   @override
   State<OrdersScreen> createState() => _OrdersScreenState();
@@ -16,9 +15,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.orderId != null) {
-      context.read<OrdersCubit>().getOrders(widget.orderId!);
-    }
+    context.read<OrdersCubit>().getOrders();
   }
 
   @override
@@ -33,8 +30,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 : <OrderModel>[];
             return RefreshIndicator(
               color: Colors.deepOrange,
-              onRefresh: () =>
-                  context.read<OrdersCubit>().getOrders(widget.orderId!),
+              onRefresh: () => context.read<OrdersCubit>().getOrders(),
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
                 children: [
@@ -62,9 +58,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   else if (state is OrdersFailureState)
                     _MessageState(
                       message: state.error,
-                      onRetry: () => context.read<OrdersCubit>().getOrders(
-                        widget.orderId!,
-                      ),
+                      onRetry: () => context.read<OrdersCubit>().getOrders(),
                     )
                   else if (orders.isEmpty)
                     const _MessageState(message: 'You have no orders yet.')
