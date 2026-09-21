@@ -1,7 +1,7 @@
 // main_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:otlop_app/custom_bottom_nav.dart';
+import 'package:otlop_app/core/common_widgets/custom_bottom_nav.dart';
 import 'package:otlop_app/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:otlop_app/features/cart/presentation/screens/cart_screen.dart';
 import 'package:otlop_app/features/home/presentation/cubits/brands_cubit.dart';
@@ -10,6 +10,7 @@ import 'package:otlop_app/features/home/presentation/cubits/products_cubit/produ
 import 'package:otlop_app/features/home/presentation/screens/home_screen.dart';
 import 'package:otlop_app/features/orders/presentation/cubit/orders_cubit.dart';
 import 'package:otlop_app/features/orders/presentation/screens/orders_screen.dart';
+import 'package:otlop_app/features/profile/presentation/screens/profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({super.key, this.index});
@@ -26,7 +27,13 @@ class _MainScreenState extends State<MainScreen> {
       const Center(child: Text("Explore")),
       const CartScreen(),
       const OrdersScreen(),
-      const Center(child: Text("Profile")),
+      ProfileScreen(
+        onOrdersTap: () {
+          setState(() {
+            widget.index = 3;
+          });
+        },
+      ),
     ];
 
     return MultiBlocProvider(
@@ -37,7 +44,6 @@ class _MainScreenState extends State<MainScreen> {
         BlocProvider(create: (context) => CartCubit()),
         BlocProvider(create: (context) => OrdersCubit()),
       ],
-
       child: Scaffold(
         bottomNavigationBar: CustomBottomNav(
           currentIndex: widget.index ?? 0,

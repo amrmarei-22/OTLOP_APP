@@ -29,6 +29,7 @@ class OrdersRemoteDataSource {
               .map(OrderModel.fromJson)
               .toList();
         }
+        if (orders == null || data.isEmpty) return [];
         return [OrderModel.fromJson(data)];
       } else if (response.data is List) {
         return (response.data as List)
@@ -40,6 +41,10 @@ class OrdersRemoteDataSource {
       }
     } on DioException catch (error) {
       log('Orders error: ${error.response?.data ?? error.message}');
+      if (error.response?.statusCode == 404 ||
+          error.response?.statusCode == 500) {
+        return [];
+      }
       throw Exception(_message(error));
     }
   }

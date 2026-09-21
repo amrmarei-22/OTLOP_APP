@@ -25,13 +25,18 @@ class OrdersCubit extends Cubit<OrdersState> {
       orders = ordersById.values.toList()
         ..sort((first, second) => second.orderDate.compareTo(first.orderDate));
       emit(OrdersSuccessState(orders: orders));
-    } catch (error) {
-      log('Orders error: $error');
-      if (orders.isNotEmpty) {
-        emit(OrdersSuccessState(orders: orders));
+      if (orders.isEmpty) {
+        log('Orders are empty');
       } else {
-        emit(OrdersFailureState(error: error.toString()));
+        log('Orders fetched successfully: ${orders.length} orders');
       }
+    }  
+    catch (error) {
+      
+      emit(OrdersFailureState(error: error.toString()));
+    
+
+  
     }
   }
 
