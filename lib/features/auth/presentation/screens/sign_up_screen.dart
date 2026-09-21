@@ -1,8 +1,6 @@
 // features/auth/presentation/screens/sign_up_screen.dart
-import 'dart:developer';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:otlop_app/core/common_widgets/custom_elevated_button.dart';
 import 'package:otlop_app/core/common_widgets/custom_text_button.dart';
 import 'package:otlop_app/core/common_widgets/titled_text_field.dart';
@@ -13,6 +11,9 @@ import 'package:otlop_app/features/auth/presentation/widgets/auth_header_section
 import 'package:otlop_app/features/auth/presentation/widgets/auth_other_register_section.dart';
 import 'package:otlop_app/features/auth/presentation/widgets/forget_pass_section.dart';
 import 'package:otlop_app/features/auth/presentation/widgets/phone_text_field.dart';
+import 'package:otlop_app/features/auth/presentation/cubits/auth_cubit/auth_cubit.dart';
+import 'package:otlop_app/features/auth/presentation/cubits/auth_cubit/auth_states.dart';
+import 'package:otlop_app/main_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -29,23 +30,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController phoneCtl = TextEditingController();
   bool isVisiable = true;
 
-  Future<void> signUp() async {
-    final Dio dio = Dio();
-    try {
-      final Response response = await dio.post(
-        "https://talabat639.runasp.net/api/Account/Register",
-        data: {
-          "displayName": nameCtl.text,
-          "email": emailCtl.text,
-          "password": passwordCtl.text,
-          "phoneNumber": phoneCtl.text,
-        },
-      );
-
-      log("response:$response");
-    } on DioException catch (e) {
-      log('error is : ${e.response!.data['errors']}');
-    }
+  @override
+  void dispose() {
+    nameCtl.dispose();
+    emailCtl.dispose();
+    passwordCtl.dispose();
+    phoneCtl.dispose();
+    super.dispose();
   }
 
   @override
@@ -109,16 +100,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   //* ForgetPassSection
                   ForgetPassSection(),
 
-                  CustomElevatedButton(
-                    text: 'Sign Up',
-                    onPressed: () async {
-                      if (myKey.currentState!.validate()) {
-                        log("Name: ${nameCtl.text}");
-                        log("Email: ${emailCtl.text}");
-                        log("Pass: ${passwordCtl.text}");
-                        log("Pass: ${phoneCtl.text}");
-                        await signUp();
+                  BlocConsumer<AuthCubit, AuthState>(
+                    listener: (context, state) {
+                      if (state is SignUpSuccessState) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => MainScreen()),
+                        );
+                      } else if (state is SignUpFailureState) {
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text(state.error)));
                       }
+                    },
+                    builder: (context, state) {
+                      if (state is SignUpLoadingState) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primayClr,
+                          ),
+                        );
+                      }
+                      return CustomElevatedButton(
+                        text: 'Sign Up',
+                        onPressed: () {
+                          if (myKey.currentState!.validate()) {
+                            context.read<AuthCubit>().register(
+                              name: nameCtl.text.trim(),
+                              email: emailCtl.text.trim(),
+                              password: passwordCtl.text,
+                              phone: phoneCtl.text.trim(),
+                            );
+                          }
+                        },
+                      );
                     },
                   ),
                   SizedBox(height: 15),

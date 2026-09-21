@@ -146,7 +146,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => SignUpScreen(),
+                              builder: (context) => BlocProvider.value(
+                                value: context.read<AuthCubit>(),
+                                child: const SignUpScreen(),
+                              ),
                             ),
                           );
                         },
