@@ -10,6 +10,7 @@ import 'package:otlop_app/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:otlop_app/features/home/presentation/cubits/products_cubit/categories_cubit.dart';
 import 'package:otlop_app/features/home/presentation/screens/filter_products_screen.dart';
 import 'package:otlop_app/features/home/presentation/states/categories_states.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeCategoriesSection extends StatefulWidget {
   const HomeCategoriesSection({super.key});
@@ -17,6 +18,17 @@ class HomeCategoriesSection extends StatefulWidget {
   @override
   State<HomeCategoriesSection> createState() => _HomeCategoriesSectionState();
 }
+
+final Map<String, String> categoryIcons = {
+  "Frappuccino": "assets/icons/frappe-svgrepo-com.svg",
+  "Mocha": "assets/icons/mocha-svgrepo-com.svg",
+  "Latte": "assets/icons/latte.svg",
+  "Macchiato": "assets/icons/Frapp.svg",
+  "Matcha": "assets/icons/cocktail-svgrepo-com.svg",
+  "Donuts": "assets/icons/donut-doughnut-sweet-dessert-food-fastfood-svgrepo-com.svg",
+  "Cake": "assets/icons/cake-svgrepo-com.svg",
+  "Salad": "assets/icons/salad-svgrepo-com.svg",
+};
 
 class _HomeCategoriesSectionState extends State<HomeCategoriesSection> {
   @override
@@ -79,11 +91,24 @@ class _HomeCategoriesSectionState extends State<HomeCategoriesSection> {
                               color: AppColors.whiteClr,
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: Image.network(
-                              myCategories[index]['pictureUrl'],
-                              width: 30,
-                              height: 40,
-                            ),
+                            child: Builder(builder: (context) {
+                              final categoryName = myCategories[index]['name'];
+                              final iconPath = categoryIcons[categoryName];
+                              if (iconPath != null) {
+                                return SvgPicture.asset(
+                                  iconPath,
+                                  width: 30,
+                                  height: 40,
+                                );
+                              } else {
+                                return Icon(
+                                  Icons.category,
+                                  size: 30,
+                                );
+                              }
+                            }),
+                            
+                            
                           ),
                           SizedBox(height: 10),
                           Text(

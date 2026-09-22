@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:otlop_app/core/common_widgets/custom_bottom_nav.dart';
 import 'package:otlop_app/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:otlop_app/features/cart/presentation/screens/cart_screen.dart';
+import 'package:otlop_app/features/explore/presentation/screens/explore_screen.dart';
 import 'package:otlop_app/features/home/presentation/cubits/brands_cubit.dart';
 import 'package:otlop_app/features/home/presentation/cubits/products_cubit/categories_cubit.dart';
 import 'package:otlop_app/features/home/presentation/cubits/products_cubit/products_cubit.dart';
@@ -13,24 +14,26 @@ import 'package:otlop_app/features/orders/presentation/screens/orders_screen.dar
 import 'package:otlop_app/features/profile/presentation/screens/profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  MainScreen({super.key, this.index});
-  int? index;
+  const MainScreen({super.key, this.index});
+  final int? index;
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
+  late int currentIndex = widget.index ?? 0;
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
       const HomeScreen(),
-      const Center(child: Text("Explore")),
+      const ExploreScreen(),
       const CartScreen(),
       const OrdersScreen(),
       ProfileScreen(
         onOrdersTap: () {
           setState(() {
-            widget.index = 3;
+            currentIndex = 3;
           });
         },
       ),
@@ -46,14 +49,14 @@ class _MainScreenState extends State<MainScreen> {
       ],
       child: Scaffold(
         bottomNavigationBar: CustomBottomNav(
-          currentIndex: widget.index ?? 0,
+          currentIndex: currentIndex,
           onTap: (index) {
             setState(() {
-              widget.index = index;
+              currentIndex = index;
             });
           },
         ),
-        body: screens[widget.index ?? 0],
+        body: screens[currentIndex],
       ),
     );
   }

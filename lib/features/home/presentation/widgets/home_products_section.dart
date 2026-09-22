@@ -68,6 +68,7 @@ class _HomeProductsSectionState extends State<HomeProductsSection> {
                     }
                   },
                   child: GridView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: products.length,
