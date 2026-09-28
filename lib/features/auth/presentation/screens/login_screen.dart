@@ -1,14 +1,11 @@
 // features/auth/presentation/screens/login_screen.dart
 
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:otlop_app/core/common_widgets/custom_elevated_button.dart';
 import 'package:otlop_app/core/common_widgets/custom_text_button.dart';
 import 'package:otlop_app/core/common_widgets/titled_text_field.dart';
 import 'package:otlop_app/core/helper/validators.dart';
-import 'package:otlop_app/core/theme/app_colors.dart';
 import 'package:otlop_app/features/auth/data/data_source/auth_remote_data_source.dart';
 import 'package:otlop_app/features/auth/presentation/cubits/auth_cubit/auth_cubit.dart';
 import 'package:otlop_app/features/auth/presentation/cubits/auth_cubit/auth_states.dart';
@@ -35,7 +32,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isVisiable = true;
   @override
   void dispose() {
-    log("=========");
     super.dispose();
     emailCtl.dispose();
     passwordCtl.dispose();
@@ -44,6 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(30, 40, 25, 38),
@@ -136,6 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Text(
                         'Don`t have an account ?',
                         style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -153,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           );
                         },
-                        textClr: AppColors.primayClr,
+                        textClr: Theme.of(context).colorScheme.primary,
                       ),
                     ],
                   ),

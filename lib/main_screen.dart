@@ -38,6 +38,18 @@ class _MainScreenState extends State<MainScreen> {
         },
       ),
     ];
+    //  final cartState = context.watch<CartCubit>().state;
+    // final ordersState = context.watch<OrdersCubit>().state;
+    
+    // final cartCount = cartState is GetCartItemsSuccessState
+    //     ? cartState.cartItems.fold<int>(
+    //         0,
+    //         (total, item) => total + item.quantity,
+    //       )
+    //     : 0;
+    // final ordersCount = ordersState is OrdersSuccessState
+    //     ? ordersState.orders.length
+    //     : 0;
 
     return MultiBlocProvider(
       providers: [

@@ -1,6 +1,5 @@
 // auth_header_section.dart
 import 'package:flutter/material.dart';
-import 'package:otlop_app/core/theme/app_colors.dart';
 
 class AuthHeaderSection extends StatelessWidget {
   const AuthHeaderSection({
@@ -11,18 +10,23 @@ class AuthHeaderSection extends StatelessWidget {
   final String title, subTitle;
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         Text(
           title,
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: colorScheme.onSurface,
+            fontSize: 25,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         Text(
           subTitle,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.greyClr,
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
       ],

@@ -8,19 +8,24 @@ class RowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Text(
           title,
-          style: TextStyle(fontSize: 13, color: Colors.grey, height: 1.5),
+          style: TextStyle(
+            fontSize: 13,
+            color: colorScheme.onSurfaceVariant,
+            height: 1.5,
+          ),
         ),
-        Spacer(),
+        const Spacer(),
         Text(
           price,
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: Colors.grey[700],
+            color: colorScheme.onSurface,
             letterSpacing: 0.8,
           ),
         ),

@@ -4,7 +4,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:otlop_app/core/theme/app_colors.dart';
 import 'package:otlop_app/core/theme/app_styles.dart';
 import 'package:otlop_app/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:otlop_app/features/home/presentation/cubits/products_cubit/categories_cubit.dart';
@@ -25,7 +24,8 @@ final Map<String, String> categoryIcons = {
   "Latte": "assets/icons/latte.svg",
   "Macchiato": "assets/icons/Frapp.svg",
   "Matcha": "assets/icons/cocktail-svgrepo-com.svg",
-  "Donuts": "assets/icons/donut-doughnut-sweet-dessert-food-fastfood-svgrepo-com.svg",
+  "Donuts":
+      "assets/icons/donut-doughnut-sweet-dessert-food-fastfood-svgrepo-com.svg",
   "Cake": "assets/icons/cake-svgrepo-com.svg",
   "Salad": "assets/icons/salad-svgrepo-com.svg",
 };
@@ -39,12 +39,21 @@ class _HomeCategoriesSectionState extends State<HomeCategoriesSection> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [Text("Categories", style: AppStyles.style18Bold)],
+          children: [
+            Text(
+              "Categories",
+              style: AppStyles.style18Bold.copyWith(
+                color: colorScheme.onSurface,
+              ),
+            ),
+          ],
         ),
+        const SizedBox(height: 10),
 
         SizedBox(
           height: 120,
@@ -71,12 +80,11 @@ class _HomeCategoriesSectionState extends State<HomeCategoriesSection> {
                                 BlocProvider(
                                   create: (context) => CategoriesCubit(),
                                 ),
-                                BlocProvider(
-                                  create: (context) => CartCubit(),
-                                ),
+                                BlocProvider(create: (context) => CartCubit()),
                               ],
                               child: FilterProductsScreen(
-                                title: '${myCategories[index]['name']} Products',
+                                title:
+                                    '${myCategories[index]['name']} Products',
                                 catId: myCategories[index]['id'],
                               ),
                             ),
@@ -86,34 +94,34 @@ class _HomeCategoriesSectionState extends State<HomeCategoriesSection> {
                       child: Column(
                         children: [
                           Container(
-                            padding: EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: AppColors.whiteClr,
+                              color: colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: colorScheme.outline, width: 1),
                             ),
-                            child: Builder(builder: (context) {
-                              final categoryName = myCategories[index]['name'];
-                              final iconPath = categoryIcons[categoryName];
-                              if (iconPath != null) {
-                                return SvgPicture.asset(
-                                  iconPath,
-                                  width: 30,
-                                  height: 40,
-                                );
-                              } else {
-                                return Icon(
-                                  Icons.category,
-                                  size: 30,
-                                );
-                              }
-                            }),
-                            
-                            
+                            child: Builder(
+                              builder: (context) {
+                                final categoryName =
+                                    myCategories[index]['name'];
+                                final iconPath = categoryIcons[categoryName];
+                                if (iconPath != null) {
+                                  return SvgPicture.asset(
+                                    iconPath,
+                                    width: 30,
+                                    height: 40,
+                                  );
+                                } else {
+                                  return Icon(Icons.category, size: 30);
+                                }
+                              },
+                            ),
                           ),
                           SizedBox(height: 10),
                           Text(
                             myCategories[index]["name"],
                             style: AppStyles.style12.copyWith(
+                              color: colorScheme.onSurface,
                               fontWeight: FontWeight.w500,
                             ),
                           ),

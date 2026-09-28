@@ -2,7 +2,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:otlop_app/core/theme/app_colors.dart';
 import 'package:otlop_app/core/common_widgets/custom_text_button.dart';
 
 class ForgetPassSection extends StatefulWidget {
@@ -10,12 +9,16 @@ class ForgetPassSection extends StatefulWidget {
 
   @override
   State<ForgetPassSection> createState() => _ForgetPassSectionState();
+  
 }
 
 class _ForgetPassSectionState extends State<ForgetPassSection> {
   bool isActive = false;
   @override
+
   Widget build(BuildContext context) {
+      final colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       children: [
         Checkbox(
@@ -40,7 +43,7 @@ class _ForgetPassSectionState extends State<ForgetPassSection> {
         Spacer(),
         CustomTextButton(
           text: 'Forgot Password',
-          textClr: AppColors.primayClr,
+          textClr: colorScheme.primary,
           onPressed: () {
             log("Forget pass pressed");
           },

@@ -1,7 +1,6 @@
 // home_brands_section.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:otlop_app/core/theme/app_colors.dart';
 import 'package:otlop_app/core/theme/app_styles.dart';
 import 'package:otlop_app/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:otlop_app/features/home/presentation/cubits/brands_cubit.dart';
@@ -24,13 +23,17 @@ class _HomeBrandsSectionState extends State<HomeBrandsSection> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Brands", style: AppStyles.style18Bold),
-        SizedBox(height: 10),
+        Text(
+          "Brands",
+          style: AppStyles.style18Bold.copyWith(color: colorScheme.onSurface),
+        ),
+        const SizedBox(height: 10),
         SizedBox(
-          height: 55,
+          height: 50,
           child: BlocBuilder<BrandsCubitCubit, BrandsCubitState>(
             builder: (context, state) {
               if (state is BrandsCubitLoading) {
@@ -45,9 +48,12 @@ class _HomeBrandsSectionState extends State<HomeBrandsSection> {
                   itemBuilder: (context, index) {
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.whiteClr,
+                        backgroundColor: colorScheme.surfaceContainerHighest,
+                        foregroundColor: colorScheme.onSurface,
+                        elevation: 0,
+                        side: BorderSide(color: colorScheme.outline, width: 1),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadiusGeometry.circular(8),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       onPressed: () {
@@ -59,9 +65,7 @@ class _HomeBrandsSectionState extends State<HomeBrandsSection> {
                                 BlocProvider(
                                   create: (context) => BrandsCubitCubit(),
                                 ),
-                                BlocProvider(
-                                  create: (context) => CartCubit(),
-                                ),
+                                BlocProvider(create: (context) => CartCubit()),
                               ],
                               child: FilterProductsScreen(
                                 title: '${brands[index]['name']} Products',
@@ -74,7 +78,7 @@ class _HomeBrandsSectionState extends State<HomeBrandsSection> {
                       child: Text(
                         brands[index]['name'],
                         style: AppStyles.style14SemiBold.copyWith(
-                          color: AppColors.blackClr,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                     );

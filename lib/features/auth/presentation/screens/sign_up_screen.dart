@@ -41,15 +41,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(30, 40, 25, 38),
+          padding: const EdgeInsets.fromLTRB(25, 25, 25, 30),
           child: SingleChildScrollView(
             child: Form(
               key: myKey,
               child: Column(
-                spacing: 10,
+                spacing: 5,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   //* Auth Header
@@ -57,7 +59,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     title: 'Create an account',
                     subTitle: 'Connect with your friends today!',
                   ),
-                  SizedBox(height: 35),
+                  SizedBox(height: 15),
                   //* TitledTextFiled
                   TitledTextField(
                     controller: nameCtl,
@@ -142,13 +144,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                   //* Auth Other Register
                   AuthOtherRegisterSection(),
-                  SizedBox(height: 40),
+                  SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'Already have an account ?',
                         style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -158,7 +161,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        textClr: AppColors.primayClr,
+                        textClr: colorScheme.primary,
                       ),
                     ],
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:otlop_app/core/theme/app_colors.dart';
 import 'package:otlop_app/features/orders/data/models/order_model.dart';
 import 'package:otlop_app/features/orders/presentation/cubit/orders_cubit.dart';
 import 'package:otlop_app/features/orders/presentation/states/orders_states.dart';
@@ -20,8 +21,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: BlocBuilder<OrdersCubit, OrdersState>(
           builder: (context, state) {
@@ -29,15 +31,15 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 ? state.orders
                 : <OrderModel>[];
             return RefreshIndicator(
-              color: Colors.deepOrange,
+              color: colorScheme.primary,
               onRefresh: () => context.read<OrdersCubit>().getOrders(),
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
                 children: [
-                  const Text(
+                  Text(
                     'My Orders',
                     style: TextStyle(
-                      color: Color(0xFF10233F),
+                      color: colorScheme.onSurface,
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
                     ),
@@ -45,14 +47,17 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   const SizedBox(height: 4),
                   Text(
                     '${orders.length} orders',
-                    style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+                    style: TextStyle(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 13,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   if (state is OrdersLoadingState ||
-                      state is OrdersInitialState)
-                    const Center(
+                       state is OrdersInitialState)
+                    Center(
                       child: CircularProgressIndicator(
-                        color: Colors.deepOrange,
+                        color: colorScheme.primary,
                       ),
                     )
                   else if (state is OrdersFailureState)
@@ -86,13 +91,14 @@ class _OrderCard extends StatelessWidget {
 
   Color _statusColor(String status) {
     final value = status.toLowerCase();
-    if (value.contains('deliver')) return const Color(0xFF269653);
-    if (value.contains('cancel')) return const Color(0xFFD64545);
-    return const Color(0xFFF28B18);
+    if (value.contains('deliver')) return AppColors.greenClr;
+    if (value.contains('cancel')) return AppColors.redClr;
+    return AppColors.orangeClr;
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final statusColor = _statusColor(order.status);
     final itemCount = order.items.fold<int>(
       0,
@@ -104,7 +110,7 @@ class _OrderCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 14),
       elevation: 0,
-      color: Colors.white,
+      color: colorScheme.surfaceContainerHighest,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -115,8 +121,8 @@ class _OrderCard extends StatelessWidget {
               children: [
                 Text(
                   'Order #${order.id}',
-                  style: const TextStyle(
-                    color: Color(0xFF10233F),
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
                   ),
@@ -151,7 +157,10 @@ class _OrderCard extends StatelessWidget {
             const SizedBox(height: 7),
             Text(
               date,
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 13,
+              ),
             ),
             const SizedBox(height: 14),
             SizedBox(
@@ -165,32 +174,36 @@ class _OrderCard extends StatelessWidget {
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: imageUrl.isEmpty
-                        ? _placeholder()
+                        ? _placeholder(colorScheme)
                         : Image.network(
                             imageUrl,
                             width: 48,
                             height: 48,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => _placeholder(),
+                            errorBuilder: (_, __, ___) =>
+                                _placeholder(colorScheme),
                           ),
                   );
                 },
               ),
             ),
             const SizedBox(height: 14),
-            Divider(color: Colors.grey.shade200, height: 1),
+            Divider(color: colorScheme.outlineVariant, height: 1),
             const SizedBox(height: 12),
             Row(
               children: [
                 Text(
                   '$itemCount items · ${order.deliveryMethod}',
-                  style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 13,
+                  ),
                 ),
                 const Spacer(),
                 Text(
                   '${order.total.toStringAsFixed(0)} EGP',
-                  style: const TextStyle(
-                    color: Color(0xFF10233F),
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
                   ),
@@ -203,10 +216,13 @@ class _OrderCard extends StatelessWidget {
     );
   }
 
-  Widget _placeholder() => Container(
+  Widget _placeholder(ColorScheme colorScheme) => Container(
     width: 48,
-    color: const Color(0xFFF0F2F5),
-    child: const Icon(Icons.local_cafe_outlined, color: Colors.grey),
+    color: colorScheme.surfaceContainerHighest,
+    child: Icon(
+      Icons.local_cafe_outlined,
+      color: colorScheme.onSurfaceVariant,
+    ),
   );
 }
 
@@ -217,16 +233,21 @@ class _MessageState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         const SizedBox(height: 80),
         Icon(
           Icons.receipt_long_outlined,
           size: 48,
-          color: Colors.grey.shade400,
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
         ),
         const SizedBox(height: 12),
-        Text(message, textAlign: TextAlign.center),
+        Text(
+          message,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: colorScheme.onSurfaceVariant),
+        ),
         if (onRetry != null)
           TextButton(onPressed: onRetry, child: const Text('Try again')),
       ],

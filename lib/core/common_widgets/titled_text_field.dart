@@ -1,6 +1,5 @@
 // titled_text_field.dart
 import 'package:flutter/material.dart';
-import 'package:otlop_app/core/theme/app_colors.dart';
 
 class TitledTextField extends StatelessWidget {
   const TitledTextField({
@@ -20,6 +19,7 @@ class TitledTextField extends StatelessWidget {
   final TextEditingController controller;
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       spacing: 5,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,7 +27,7 @@ class TitledTextField extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-            color: AppColors.primayClr,
+            color: colorScheme.primary,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -40,18 +40,27 @@ class TitledTextField extends StatelessWidget {
           decoration: InputDecoration(
             suffixIcon: suffixIcon,
             hintText: hintText,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+            filled: true,
+            fillColor: colorScheme.surfaceContainerHighest,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(color: colorScheme.outline),
+            ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: BorderSide(color: Colors.red),
+              borderSide: BorderSide(color: colorScheme.error),
             ),
-            hintStyle: TextStyle(color: AppColors.greyClr, fontSize: 14),
+            hintStyle: TextStyle(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 14,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(color: colorScheme.outline),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: BorderSide(color: AppColors.primayClr, width: 1.5),
+              borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
             ),
           ),
         ),
