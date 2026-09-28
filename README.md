@@ -51,8 +51,6 @@ flutter pub get
 flutter run
 ```
 
-> Add your Google Maps API key in `android/app/src/main/AndroidManifest.xml` and `ios/Runner/AppDelegate.swift`. Never commit real keys to the repo.
-
 ## 👤 Author
 
 **Amr Marei** · [@amrmarei-22](https://github.com/amrmarei-22)
