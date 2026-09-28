@@ -55,8 +55,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9FA),
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -69,18 +70,21 @@ class _ExploreScreenState extends State<ExploreScreen> {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(14, 12, 14, 28),
             children: [
-              const Text(
+              Text(
                 'Explore',
                 style: TextStyle(
-                  color: Color(0xFF202124),
+                  color: colorScheme.onSurface,
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
                 ),
               ),
               const SizedBox(height: 2),
-              const Text(
+              Text(
                 'Browse by category or brand',
-                style: TextStyle(color: Color(0xFF9BA3B2), fontSize: 15),
+                style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 15,
+                ),
               ),
               const SizedBox(height: 28),
               const _SectionTitle('CATEGORIES'),
@@ -142,10 +146,11 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Text(
       title,
-      style: const TextStyle(
-        color: Color(0xFF98A1B1),
+      style: TextStyle(
+        color: colorScheme.onSurfaceVariant,
         fontSize: 12,
         fontWeight: FontWeight.w800,
         letterSpacing: 1.2,
@@ -173,18 +178,19 @@ class _CategoriesGrid extends StatelessWidget {
   const _CategoriesGrid({required this.categories, required this.onTap});
 
   static const tileColors = [
-    Color(0xFFFFF0F1),
-    Color(0xFFFFF8E7),
-    Color(0xFFF1F2F4),
-    Color(0xFFF3F1FF),
-    Color(0xFFEFFFF7),
-    Color(0xFFFFF1F8),
-    Color(0xFFFFF6EA),
-    Color(0xFFEEF6FF),
+    Color(0xFFFFF2EC), // Soft warm peach
+    Color(0xFFFFF7EC), // Soft warm latte / honey
+    Color(0xFFF7F3EE), // Soft almond cream
+    Color(0xFFFFF0F3), // Soft strawberry cream
+    Color(0xFFF1F6F2), // Soft sage cream
+    Color(0xFFFFF5EA), // Soft apricot
+    Color(0xFFF4F3F8), // Soft vanilla tint
+    Color(0xFFF2F4F7), // Soft neutral warm grey
   ];
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -198,7 +204,9 @@ class _CategoriesGrid extends StatelessWidget {
       itemBuilder: (context, index) {
         final category = categories[index] as Map;
         return Material(
-          color: tileColors[index % tileColors.length],
+          color: colorScheme.brightness == Brightness.dark
+              ? colorScheme.surfaceContainerHighest
+              : tileColors[index % tileColors.length],
           borderRadius: BorderRadius.circular(20),
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
@@ -216,8 +224,8 @@ class _CategoriesGrid extends StatelessWidget {
                       category['name']?.toString() ?? 'Category',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF252525),
+                      style: TextStyle(
+                        color: colorScheme.onSurface,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                       ),
@@ -240,11 +248,12 @@ class _CategoryIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     if (iconPath == null) {
-      return const Icon(
+      return Icon(
         Icons.category_outlined,
         size: 27,
-        color: Colors.black87,
+        color: colorScheme.onSurface,
       );
     }
     return SvgPicture.asset(
@@ -253,7 +262,7 @@ class _CategoryIcon extends StatelessWidget {
       height: 32,
       fit: BoxFit.contain,
       errorBuilder: (_, __, ___) =>
-          const Icon(Icons.category_outlined, size: 27, color: Colors.black87),
+          Icon(Icons.category_outlined, size: 27, color: colorScheme.onSurface),
     );
   }
 }
@@ -266,6 +275,7 @@ class _BrandsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -275,7 +285,7 @@ class _BrandsList extends StatelessWidget {
         final brand = brands[index] as Map;
         final name = brand['name']?.toString() ?? 'Brand';
         return Material(
-          color: Colors.white,
+          color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(20),
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
@@ -291,13 +301,13 @@ class _BrandsList extends StatelessWidget {
                       height: 48,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFF2F1),
+                        color: colorScheme.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Text(
                         name.isEmpty ? '?' : name[0].toUpperCase(),
-                        style: const TextStyle(
-                          color: Color(0xFFFF4B3E),
+                        style: TextStyle(
+                          color: colorScheme.primary,
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                         ),
@@ -307,14 +317,17 @@ class _BrandsList extends StatelessWidget {
                     Expanded(
                       child: Text(
                         name,
-                        style: const TextStyle(
-                          color: Color(0xFF262626),
+                        style: TextStyle(
+                          color: colorScheme.onSurface,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
-                    const Icon(Icons.chevron_right, color: Color(0xFFC7CDD6)),
+                    Icon(
+                      Icons.chevron_right,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ],
                 ),
               ),

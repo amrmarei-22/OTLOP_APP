@@ -33,8 +33,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: colorScheme.surface,
       body: Stack(
         children: [
           Positioned(
@@ -52,13 +53,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     height: double.infinity,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) =>
-                        Container(color: Colors.grey[300]),
+                        Container(color: colorScheme.surfaceContainerHighest),
                   ),
                   Positioned(
                     top: 40,
                     left: 16,
                     child: CircleAvatar(
-                      backgroundColor: Colors.black38,
+                      backgroundColor: Colors.black.withValues(alpha: 0.4),
                       child: IconButton(
                         icon: const Icon(Icons.arrow_back, color: Colors.white),
                         onPressed: () => Navigator.pop(context),
@@ -78,11 +79,11 @@ class _DetailsScreenState extends State<DetailsScreen> {
             builder: (context, scrollController) {
               return Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: colorScheme.surface,
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(30),
                   ),
-                  border: Border.all(color: Colors.grey.shade300, width: 1.5),
+                  border: Border.all(color: colorScheme.outline, width: 1),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.08),
@@ -102,7 +103,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         height: 5,
                         margin: const EdgeInsets.only(bottom: 20),
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
+                          color: colorScheme.outlineVariant,
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
@@ -110,29 +111,31 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
                     Text(
                       widget.product.name ?? "Blueberry Cheesecake",
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
 
                     Text(
                       '${widget.product.price} EGP',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
-                        color: Colors.deepOrange,
+                        color: colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 20),
 
-                    const Text(
+                    Text(
                       "ABOUT THIS ITEM",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey,
+                        color: colorScheme.onSurfaceVariant,
                         fontSize: 12,
+                        letterSpacing: 1.1,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -140,7 +143,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     Text(
                       widget.product.description ??
                           "Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna.",
-                      style: TextStyle(color: Colors.grey[600], height: 1.5),
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        height: 1.5,
+                      ),
                     ),
                   ],
                 ),
@@ -151,13 +157,18 @@ class _DetailsScreenState extends State<DetailsScreen> {
       ),
 
       bottomNavigationBar: Container(
-        color: Colors.white,
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          border: Border(
+            top: BorderSide(color: colorScheme.outlineVariant, width: 1),
+          ),
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Row(
@@ -166,17 +177,28 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     onPressed: () {
                       if (quantity > 1) setState(() => quantity--);
                     },
-                    icon: const Icon(Icons.remove, size: 18),
+                    icon: Icon(
+                      Icons.remove,
+                      size: 18,
+                      color: colorScheme.onSurface,
+                    ),
                   ),
                   Text(
                     '$quantity',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                    ),
                   ),
                   IconButton(
                     onPressed: () => setState(() => quantity++),
-                    icon: const Icon(Icons.add, size: 18, color: Colors.white),
+                    icon: Icon(
+                      Icons.add,
+                      size: 18,
+                      color: colorScheme.onPrimary,
+                    ),
                     style: IconButton.styleFrom(
-                      backgroundColor: Colors.deepOrange,
+                      backgroundColor: colorScheme.primary,
                       shape: const CircleBorder(),
                     ),
                   ),
@@ -198,7 +220,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepOrange,
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -206,8 +229,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 ),
                 child: Text(
                   'Add to cart • ${(widget.product.price * quantity).toStringAsFixed(1)} EGP',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: colorScheme.onPrimary,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),

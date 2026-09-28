@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:otlop_app/core/theme/app_colors.dart';
+import 'package:otlop_app/core/theme/theme_cubit.dart';
 import 'package:otlop_app/features/auth/data/auth_session.dart';
 import 'package:otlop_app/features/auth/presentation/cubits/auth_cubit/auth_cubit.dart';
 import 'package:otlop_app/features/auth/presentation/cubits/auth_cubit/auth_states.dart';
 import 'package:otlop_app/features/auth/presentation/screens/login_screen.dart';
+import 'package:otlop_app/features/profile/presentation/screens/address_map_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   final VoidCallback onOrdersTap;
@@ -49,6 +51,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final name = AuthSession.displayName?.trim().isNotEmpty == true
         ? AuthSession.displayName!.trim()
         : 'User';
@@ -74,15 +77,15 @@ class ProfileScreen extends StatelessWidget {
         final isLoggingOut = state is LogoutLoadingState;
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF8F9FA),
+          backgroundColor: colorScheme.surface,
           body: SafeArea(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(24, 42, 24, 28),
               children: [
-                const Text(
+                Text(
                   'Profile',
                   style: TextStyle(
-                    color: Color(0xFF182235),
+                    color: colorScheme.onSurface,
                     fontSize: 30,
                     fontWeight: FontWeight.w800,
                   ),
@@ -98,33 +101,49 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 _ProfileOption(
                   icon: Icons.assignment_outlined,
-                  iconColor: const Color(0xFF4285F4),
-                  iconBackground: const Color(0xFFEFF5FF),
+                  iconColor: AppColors.blueClr,
+                  iconBackground: AppColors.blueClr.withValues(alpha: 0.12),
                   title: 'My Orders',
                   subtitle: 'View your order history',
                   onTap: onOrdersTap,
                 ),
                 _ProfileOption(
                   icon: Icons.location_on,
-                  iconColor: const Color(0xFFE94B9A),
-                  iconBackground: const Color(0xFFFFF0F8),
+                  iconColor: colorScheme.primary,
+                  iconBackground: colorScheme.primary.withValues(alpha: 0.12),
                   title: 'My Address',
                   subtitle: 'Manage saved addresses',
-                  onTap: () =>
-                      _showUnavailableMessage(context, 'Address management'),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const AddressMapScreen()),
+                  ),
                 ),
                 _ProfileOption(
                   icon: Icons.settings,
-                  iconColor: const Color(0xFF9B55EA),
-                  iconBackground: const Color(0xFFF7F0FF),
+                  iconColor: AppColors.orangeClr,
+                  iconBackground: AppColors.orangeClr.withValues(alpha: 0.12),
                   title: 'Settings',
                   subtitle: 'App preferences',
-                  onTap: () => _showUnavailableMessage(context, 'Settings'),
+                  onTap: () => context.read<ThemeCubit>().toggleTheme(),
+                  trailing: BlocBuilder<ThemeCubit, ThemeMode>(
+                    builder: (context, themeMode) => Switch(
+                      activeThumbColor: AppColors.primayClr,
+                      activeTrackColor: AppColors.primayClr.withValues(
+                        alpha: 0.12,
+                      ),
+                      inactiveThumbColor: AppColors.greyClr,
+                      inactiveTrackColor: AppColors.greyClr.withValues(
+                        alpha: 0.12,
+                      ),
+                      value: themeMode == ThemeMode.dark,
+                      onChanged: (_) =>
+                          context.read<ThemeCubit>().toggleTheme(),
+                    ),
+                  ),
                 ),
                 _ProfileOption(
-                  icon: Icons.help,
-                  iconColor: AppColors.redClr,
-                  iconBackground: const Color(0xFFFFF0F0),
+                  icon: Icons.help_outline,
+                  iconColor: AppColors.greenClr,
+                  iconBackground: AppColors.greenClr.withValues(alpha: 0.12),
                   title: 'Help & Support',
                   subtitle: 'Get help or contact us',
                   onTap: () =>
@@ -141,7 +160,7 @@ class ProfileScreen extends StatelessWidget {
                     label: Text(isLoggingOut ? 'Logging out...' : 'Log out'),
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.redClr,
-                      backgroundColor: const Color(0xFFFFF0F0),
+                      backgroundColor: AppColors.redClr.withValues(alpha: 0.12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -176,16 +195,21 @@ class _ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       height: 102,
       padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
-        color: AppColors.primayClr,
+        gradient: LinearGradient(
+          colors: [colorScheme.primary, AppColors.primaryLightClr],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(23),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primayClr.withValues(alpha: 0.22),
-            blurRadius: 12,
+            color: colorScheme.primary.withValues(alpha: 0.28),
+            blurRadius: 14,
             offset: const Offset(0, 6),
           ),
         ],
@@ -197,8 +221,8 @@ class _ProfileHeader extends StatelessWidget {
             height: 56,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.28),
-              borderRadius: BorderRadius.circular(12),
+              color: Colors.white.withValues(alpha: 0.22),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Text(
               initial,
@@ -226,7 +250,10 @@ class _ProfileHeader extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   email,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.85),
+                    fontSize: 14,
+                  ),
                 ),
               ],
             ),
@@ -239,7 +266,7 @@ class _ProfileHeader extends StatelessWidget {
               size: 19,
             ),
             style: IconButton.styleFrom(
-              backgroundColor: Colors.white.withValues(alpha: 0.18),
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
               minimumSize: const Size(40, 40),
             ),
           ),
@@ -256,6 +283,7 @@ class _ProfileOption extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
+  final Widget? trailing;
 
   const _ProfileOption({
     required this.icon,
@@ -264,14 +292,16 @@ class _ProfileOption extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.trailing,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Material(
-        color: Colors.white,
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(17),
         child: InkWell(
           onTap: onTap,
@@ -300,8 +330,8 @@ class _ProfileOption extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(
-                            color: Color(0xFF293346),
+                          style: TextStyle(
+                            color: colorScheme.onSurface,
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                           ),
@@ -310,14 +340,18 @@ class _ProfileOption extends StatelessWidget {
                         Text(
                           subtitle,
                           style: TextStyle(
-                            color: Colors.blueGrey.shade400,
+                            color: colorScheme.onSurfaceVariant,
                             fontSize: 12,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(Icons.chevron_right, color: Colors.blueGrey.shade200),
+                  trailing ??
+                      Icon(
+                        Icons.chevron_right,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                 ],
               ),
             ),

@@ -50,6 +50,7 @@ class _HomeProductsSectionState extends State<HomeProductsSection> {
                         ),
                       );
                     } else if (state is AddToCartSuccessState) {
+                      context.read<CartCubit>().getCartItems();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(state.message),
@@ -79,9 +80,11 @@ class _HomeProductsSectionState extends State<HomeProductsSection> {
                       childAspectRatio: .7,
                     ),
                     itemBuilder: (context, index) {
+                      final colorScheme = Theme.of(context).colorScheme;
                       return Stack(
                         children: [
                           InkWell(
+                            borderRadius: BorderRadius.circular(16),
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -96,21 +99,32 @@ class _HomeProductsSectionState extends State<HomeProductsSection> {
                               );
                             },
                             child: Card(
+                              elevation: 0,
+                              color: colorScheme.surface,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                side: BorderSide(
+                                  color: colorScheme.outline,
+                                  width: 1,
+                                ),
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 spacing: 5,
                                 children: [
                                   Expanded(
                                     child: ClipRRect(
-                                      borderRadius: BorderRadiusGeometry.only(
-                                        topLeft: Radius.circular(15),
-                                        topRight: Radius.circular(15),
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(16),
+                                        topRight: Radius.circular(16),
                                       ),
                                       child: Image.network(
                                         products[index].image,
-
                                         width: double.infinity,
                                         fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Container(
+                                          color: colorScheme.surfaceContainerHighest,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -125,15 +139,16 @@ class _HomeProductsSectionState extends State<HomeProductsSection> {
                                           products[index].name,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-
                                           style: AppStyles.style12.copyWith(
-                                            color: AppColors.primayClr,
+                                            color: colorScheme.primary,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                         Text(
                                           products[index].description,
-                                          style: AppStyles.style14Bold,
+                                          style: AppStyles.style14Bold.copyWith(
+                                            color: colorScheme.onSurface,
+                                          ),
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -149,8 +164,8 @@ class _HomeProductsSectionState extends State<HomeProductsSection> {
                                                         .toString(),
                                                     style: AppStyles.style17Bold
                                                         .copyWith(
-                                                          color: AppColors
-                                                              .blackClr,
+                                                          color: colorScheme
+                                                              .onSurface,
                                                         ),
                                                   ),
                                                   TextSpan(
@@ -158,8 +173,8 @@ class _HomeProductsSectionState extends State<HomeProductsSection> {
                                                     style: AppStyles
                                                         .style10SemiBold
                                                         .copyWith(
-                                                          color:
-                                                              AppColors.greyClr,
+                                                          color: colorScheme
+                                                              .onSurfaceVariant,
                                                         ),
                                                   ),
                                                 ],
@@ -168,7 +183,7 @@ class _HomeProductsSectionState extends State<HomeProductsSection> {
                                             IconButton(
                                               style: IconButton.styleFrom(
                                                 backgroundColor:
-                                                    AppColors.primayClr,
+                                                    colorScheme.primary,
                                               ),
                                               onPressed: () async {
                                                 //* Add to Cart
@@ -185,7 +200,7 @@ class _HomeProductsSectionState extends State<HomeProductsSection> {
                                               },
                                               icon: Icon(
                                                 Icons.add,
-                                                color: AppColors.whiteClr,
+                                                color: colorScheme.onPrimary,
                                               ),
                                             ),
                                           ],
@@ -202,16 +217,19 @@ class _HomeProductsSectionState extends State<HomeProductsSection> {
                             left: 15,
                             top: 15,
                             child: Container(
-                              padding: EdgeInsets.all(8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
                               decoration: BoxDecoration(
-                                color: AppColors.blackClr.withValues(alpha: .5),
-                                borderRadius: BorderRadius.circular(25),
+                                color: Colors.black.withValues(alpha: .55),
+                                borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
                                 products[index].category,
                                 style: AppStyles.style12.copyWith(
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.whiteClr,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),

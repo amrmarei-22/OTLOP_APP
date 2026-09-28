@@ -39,7 +39,9 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -47,17 +49,22 @@ class _CartScreenState extends State<CartScreen> {
             child: BlocBuilder<CartCubit, CartStates>(
               builder: (context, state) {
                 if (state is GetCartItemsLoadingState) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (state is GetCartItemsFailureState) {
                   if (state.error.contains("Internal Server Error")) {
                     return Center(
                       child: Text(
                         "No items in the cart",
-                        style: AppStyles.style16Bold,
+                        style: AppStyles.style16Bold.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     );
                   }
-                  return Text(state.error);
+                  return Text(
+                    state.error,
+                    style: TextStyle(color: colorScheme.error),
+                  );
                 } else if (state is GetCartItemsSuccessState) {
                   final cartItems = state.cartItems;
                   final subtotal = calculateSubtotal(cartItems);
@@ -66,66 +73,97 @@ class _CartScreenState extends State<CartScreen> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Your Cart", style: AppStyles.style30ExtraBold),
+                      Text(
+                        "Your Cart",
+                        style: AppStyles.style30ExtraBold.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
                       Text(
                         "${cartItems.length} items",
                         style: AppStyles.style13Medium.copyWith(
-                          color: AppColors.greyClr,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 14),
 
                       Column(
                         children: [
                           ListView.builder(
-                            physics: NeverScrollableScrollPhysics(),
+                            physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemCount: cartItems.length,
                             itemBuilder: (context, index) {
                               return Card(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                elevation: 0,
+                                color: colorScheme.surface,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  side: BorderSide(
+                                    color: colorScheme.outline,
+                                    width: 1,
+                                  ),
+                                ),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
+                                  padding: const EdgeInsets.all(12.0),
                                   child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Expanded(
-                                        child: AspectRatio(
-                                          aspectRatio: 1,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadiusGeometry.circular(
-                                                  15,
-                                                ),
-                                            child: Image.network(
-                                              cartItems[index].pictureUrl,
-                                            ),
+                                      ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                        child: Image.network(
+                                          cartItems[index].pictureUrl,
+                                          width: 72,
+                                          height: 72,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, __, ___) =>
+                                              Container(
+                                            width: 72,
+                                            height: 72,
+                                            color: colorScheme
+                                                .surfaceContainerHighest,
                                           ),
                                         ),
                                       ),
-                                      SizedBox(width: 15),
+                                      const SizedBox(width: 14),
                                       Expanded(
-                                        flex: 2,
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               cartItems[index].productName,
-                                              style: AppStyles.style14Bold,
+                                              style: AppStyles.style14Bold
+                                                  .copyWith(
+                                                color: colorScheme.onSurface,
+                                              ),
                                             ),
+                                            const SizedBox(height: 2),
                                             Text(
                                               '${cartItems[index].brand} · ${cartItems[index].category}',
-                                              style: AppStyles.style11Medium,
+                                              style: AppStyles.style11Medium
+                                                  .copyWith(
+                                                color: colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
                                             ),
+                                            const SizedBox(height: 6),
                                             Row(
                                               children: [
                                                 Text(
                                                   '${cartItems[index].price} EGP',
-                                                  style: AppStyles.style14Bold,
+                                                  style: AppStyles.style14Bold
+                                                      .copyWith(
+                                                    color: colorScheme.primary,
+                                                  ),
                                                 ),
-                                                Spacer(),
+                                                const Spacer(),
                                                 IconButton(
+                                                  visualDensity:
+                                                      VisualDensity.compact,
                                                   onPressed: () {
                                                     final currentQuantity =
                                                         cartItems[index]
@@ -137,13 +175,24 @@ class _CartScreenState extends State<CartScreen> {
                                                           currentQuantity - 1,
                                                         );
                                                   },
-                                                  icon: Icon(Icons.remove),
+                                                  icon: Icon(
+                                                    Icons.remove,
+                                                    size: 18,
+                                                    color:
+                                                        colorScheme.onSurface,
+                                                  ),
                                                 ),
                                                 Text(
                                                   '${cartItems[index].quantity}',
-                                                  style: AppStyles.style14Bold,
+                                                  style: AppStyles.style14Bold
+                                                      .copyWith(
+                                                    color:
+                                                        colorScheme.onSurface,
+                                                  ),
                                                 ),
                                                 IconButton(
+                                                  visualDensity:
+                                                      VisualDensity.compact,
                                                   onPressed: () {
                                                     final currentQuantity =
                                                         cartItems[index]
@@ -155,7 +204,11 @@ class _CartScreenState extends State<CartScreen> {
                                                           currentQuantity + 1,
                                                         );
                                                   },
-                                                  icon: Icon(Icons.add),
+                                                  icon: Icon(
+                                                    Icons.add,
+                                                    size: 18,
+                                                    color: colorScheme.primary,
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -170,6 +223,15 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                           if (cartItems.isNotEmpty)
                             Card(
+                              elevation: 0,
+                              color: colorScheme.surface,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                side: BorderSide(
+                                  color: colorScheme.outline,
+                                  width: 1,
+                                ),
+                              ),
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Column(
@@ -178,9 +240,11 @@ class _CartScreenState extends State<CartScreen> {
                                   children: [
                                     Text(
                                       "Order Summary",
-                                      style: AppStyles.style14Bold,
+                                      style: AppStyles.style14Bold.copyWith(
+                                        color: colorScheme.onSurface,
+                                      ),
                                     ),
-                                    SizedBox(height: 10),
+                                    const SizedBox(height: 6),
                                     CustomSummaryItem(
                                       title: 'Subtotal',
                                       value: subtotal,
@@ -189,20 +253,20 @@ class _CartScreenState extends State<CartScreen> {
                                       title: 'Delivery Fee',
                                       value: deliveryFee,
                                     ),
-
-                                    Divider(),
-
+                                    Divider(color: colorScheme.outlineVariant),
                                     Row(
                                       children: [
                                         Text(
                                           'Total',
-                                          style: AppStyles.style16Bold,
+                                          style: AppStyles.style16Bold.copyWith(
+                                            color: colorScheme.onSurface,
+                                          ),
                                         ),
-                                        Spacer(),
+                                        const Spacer(),
                                         Text(
                                           '${total.toStringAsFixed(2)} EGP',
                                           style: AppStyles.style16Bold.copyWith(
-                                            color: AppColors.primayClr,
+                                            color: colorScheme.primary,
                                           ),
                                         ),
                                       ],
@@ -212,7 +276,7 @@ class _CartScreenState extends State<CartScreen> {
                               ),
                             ),
                           if (cartItems.isNotEmpty) ...[
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
@@ -264,8 +328,8 @@ class _CartScreenState extends State<CartScreen> {
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primayClr,
-                                  foregroundColor: Colors.white,
+                                  backgroundColor: colorScheme.primary,
+                                  foregroundColor: colorScheme.onPrimary,
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 16,
                                   ),
@@ -274,18 +338,18 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 ),
                                 child: _isCheckingOut
-                                    ? const SizedBox(
+                                    ? SizedBox(
                                         height: 20,
                                         width: 20,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          color: Colors.white,
+                                          color: colorScheme.onPrimary,
                                         ),
                                       )
                                     : Text(
                                         'Proceed to Checkout • ${total.toStringAsFixed(2)} EGP',
                                         style: AppStyles.style14Bold.copyWith(
-                                          color: Colors.white,
+                                          color: colorScheme.onPrimary,
                                         ),
                                       ),
                               ),
@@ -294,11 +358,11 @@ class _CartScreenState extends State<CartScreen> {
                         ],
                       ),
 
-                      SizedBox(height: 30),
+                      const SizedBox(height: 30),
                     ],
                   );
                 } else {
-                  return Center(child: Text("No items in the cart"));
+                  return const Center(child: Text("No items in the cart"));
                 }
               },
             ),
@@ -319,16 +383,21 @@ class CustomSummaryItem extends StatelessWidget {
   final double value;
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Text(
           title,
-          style: AppStyles.style14Medium.copyWith(color: AppColors.greyClr),
+          style: AppStyles.style14Medium.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
-        Spacer(),
+        const Spacer(),
         Text(
           '${value.toStringAsFixed(2)} EGP',
-          style: AppStyles.style14SemiBold,
+          style: AppStyles.style14SemiBold.copyWith(
+            color: colorScheme.onSurface,
+          ),
         ),
       ],
     );

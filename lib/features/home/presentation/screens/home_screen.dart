@@ -4,6 +4,7 @@ import 'package:otlop_app/core/theme/app_styles.dart';
 import 'package:otlop_app/features/home/presentation/widgets/home_brands_section.dart';
 import 'package:otlop_app/features/home/presentation/widgets/home_categories_section.dart';
 import 'package:otlop_app/features/home/presentation/widgets/home_products_section.dart';
+import 'package:otlop_app/features/home/presentation/widgets/home_offer_section.dart';
 import 'package:otlop_app/features/home/presentation/widgets/home_screen_header.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -21,10 +22,16 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 HomeScreenHeader(),
+                HomeOfferSection(),
                 HomeCategoriesSection(),
 
                 HomeBrandsSection(),
-                Text("Popular right now", style: AppStyles.style18Bold),
+                Text(
+                  "Popular right now",
+                  style: AppStyles.style18Bold.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
                 HomeProductsSection(),
               ],
             ),

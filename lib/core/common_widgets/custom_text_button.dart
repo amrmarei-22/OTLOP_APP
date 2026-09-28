@@ -1,6 +1,5 @@
 // custom_text_button.dart
 import 'package:flutter/material.dart';
-import 'package:otlop_app/core/theme/app_colors.dart';
 
 class CustomTextButton extends StatelessWidget {
   const CustomTextButton({
@@ -14,6 +13,7 @@ class CustomTextButton extends StatelessWidget {
   final void Function()? onPressed;
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return TextButton(
       style: TextButton.styleFrom(padding: EdgeInsets.zero),
       onPressed: onPressed,
@@ -22,7 +22,7 @@ class CustomTextButton extends StatelessWidget {
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: textClr ?? AppColors.blackClr,
+          color: textClr ?? colorScheme.onSurface,
         ),
       ),
     );
